@@ -31,7 +31,7 @@ lines(kings.rm5,col=3)
 lines(kings.rm7,col=4)
 lines(kings.rm9,col=5)
 lines(kings.rm11,col=6)
-legend(34,40,legend=c("puvodni rada","KP delky 3","KP delky 5","KP delky 7","KP delky 9","KP delky 11"),
+legend(34,40,legend=c("puvodni rada","KP 3","KP 5","KP 7","KP 9","KP 11"),
        lty=1,col=1:6,cex=0.8)
   # podivame se na vysledky a podle toho, jak detailni vyhlazeni chceme, volime delku klouzaveho prumeru
 

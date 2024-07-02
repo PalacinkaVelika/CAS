@@ -1,3 +1,4 @@
+Examples1 <- read.table("Examples1.txt", header = TRUE)
 #############################
 ### Linearni trend
 time<-1971:2000
@@ -82,7 +83,7 @@ AIC(mod1)
 ##############################
 ## Gompertzova krivka
 
-rada<-Examples[,5]
+rada<-Examples1[,5]
 rada.ts<-ts(rada,start=1971)
 plot(rada.ts)
 -(log(13.2))/log(0.8)
