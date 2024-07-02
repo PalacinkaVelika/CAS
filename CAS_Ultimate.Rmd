@@ -210,7 +210,143 @@ BIC(kub.trend)
 
 <br><br>
 
-# **Nadpis**
+# **Exponenciální vyrovnání**
+
+-   adaptivní přístup
+
+-   Narozdíl od metody klouzavých prům. nepočítá hodnotu z obou stran, ale jen z minulosti
+
+-   Počítá se všemi předchozími hodnotami, jejich váha exponenciálně klesá čím dál od přítomnosti jsou
+
+-   Lépe reaguje na změny trendů v datech
+
+-   **Typy:**
+
+    -   **Jednoduché exponenciální vyrovnávání**
+
+        -   pro data bez trendu/sezónnosti
+
+        -   váha pozorování klesá exponenciálně s časem
+
+        -   hodnota alpha určuje jak rychle klesá váha starších pozorování
+
+        -   alpha hodnoty 0 - 1 (prakticky 0.7 - 1)
+
+        -   větší alpha - víc beru novější a mín starší hodnoty
+
+        -   software vybírá automaticky
+
+        -   umí předpovídat hodnoty
+
+    -   **Dvojité exponenciální vyrovnávání**
+
+        -   pro data s trendem
+
+        -   váha starších pozorování klesá dvakrát 
+
+        -   podle trendu (alpha)
+
+        -   podle sezónnosti (beta)
+
+    -   **Trojité exponenciální vyrovnávání**
+
+        -   3 parametry
+
+        -   váha starších hodnot (alpha)
+
+        -   rychlost změny alpha (beta)
+
+        -   sezónnost (gama)
+
+## **Holt-Wintersova metoda**
+
+-   Odhaduje chování sezónních dat
+
+-   Nejlepší pro data s trendem a sezónností
+
+-   **Typy:**
+
+    -   **Aditivní**
+
+        -   Používá se, když sezónní výkyvy jsou přibližně konstantní.
+
+    -   **Multiplikativní**
+
+        -   Používá se, když sezónní výkyvy závisí na úrovni časové řady.
+
+```{r}
+### Vyhlazeni pomoci exponencialniho vyrovnani
+
+## Jednoduche exponencialni vyhlazovani - vhodne pro lokalne konstantni trend
+rain <- scan("http://robjhyndman.com/tsdldata/hurst/precip1.dat",skip=1)
+  # rocni srazky v Londyne merene v palcich z let 1813 az 1912
+rain.ts <- ts(rain,start=c(1813))
+plot(rain.ts)
+  # aditivni rada s konstantnim trendem
+```
+
+```{r}
+
+rain.exp<-HoltWinters(rain.ts, beta=FALSE, gamma=FALSE)
+  # jednoduche exponencialni vyrovnani
+plot(rain.exp)
+```
+
+```{r}
+  # vykresli data i s odhadnutym trendem
+rain.exp$fitted
+  # predpovedi, neboli hodnoty trendu
+rain.exp$SSE
+  # sum of squared errors - soucet druhych mocnin chyb odhadu
+  # pri exponencialnim vyhlazovani se bezne bere jako pocatek trendu prvni merena hodnota
+  # pokud chceme trend zacit v jine hodnote, je mozne vyuzit parametr l.start
+plot(HoltWinters(rain.ts, beta=FALSE, gamma=FALSE,l.start=25))
+  # jak vypada odhad trendu zacinajiciho na hodnote 25
+```
+
+```{r}
+## Predpovedi z exponencialniho vyhlazovani
+rain.exp.for<-forecast(rain.exp, h=10)
+  # vypocte 10 predpovedi na budouci uhrny srazek
+plot(rain.exp.for)
+lines(1814:1912,rain.exp$fitted[,1],col=3)
+  # zakresleni predpovedi do grafu
+  # modra cara je bodova predpoved, tmave seda plocha 80% interval spolehlivosti
+  #   a svetle seda plocha 95% interval spolehlivosti
+
+```
+
+```{r}
+## Dvojite exponencialni vyhlazovani - pri lokalne linearnim trendu
+skirts <- scan("http://robjhyndman.com/tsdldata/roberts/skirts.dat",skip=5)	
+  # rocni data o prumeru lemu sukni z let 1866 az 1911
+skirts.ts<-ts(skirts,start=c(1866))
+plot(skirts.ts)
+  # je videt nejprve rostouci a pak klesajici trend bez sezonni slozky s minimalni chybou
+
+```
+
+```{r}
+skirts.exp<-HoltWinters(skirts.ts, gamma=FALSE)
+  # Holtova metoda - zobecnene dvojite exponencialni vyrovnani
+  # odhadnute hodnoty parametru alfa a beta nam rikaji, ze odhady jsou zalozene 
+  #   predevsim na nedavnych hodnotach (zavislost nejde daleko do minulosti)
+plot(skirts.exp)
+  # vykresleni odhadnuteho trendu
+skirts.exp$SSE
+  # Soucet druhych mocnin chyb odhadu
+```
+
+```{r}
+## Predpovedi z Holtova vyhlazovani
+skirts.exp.for<-forecast(skirts.exp, h=20)
+  # vypocte 20 predpovedi
+plot(skirts.exp.for)
+lines(1868:1911,skirts.exp$fitted[,1],col=3)
+  # zakresleni predpovedi do grafu
+  # modra cara je bodova predpoved, tmave seda plocha 80% interval spolehlivosti
+  #   a svetle seda plocha 95% interval spolehlivosti
+```
 
 <br><br>
 
